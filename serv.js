@@ -14,5 +14,6 @@ try {
     }
     console.log(connect.connection.host, connect.connection.name);
 } catch (error) {
+    console.log("hai");
     console.log(error);
 }
