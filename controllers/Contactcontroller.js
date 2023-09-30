@@ -5,47 +5,96 @@ const newa = require("../model/contactschema")
 // method GET 
 // Access public
 
-const allcontacts = asynchandler((req, res)=>{
-    const data = newa.find();
-    res.status(200).json({message:"Here is the data"})
+const allcontacts = asynchandler(async(req, res)=>{
+    const data = await newa.find();
+    console.log(data);
+    res.status(200).json(data)
 })
 
 // desc create contacts in db
 // method POST 
 // Access public
 
-const createcontact = asynchandler((req, res)=>{
-    console.log(req.body);
+const createcontact = asynchandler(async(req, res)=>{
     const {name, email, password} = req.body
+
     if(!name || !email || !password){
         res.send("All Fileds are Mandatory !!")
     }
-    res.status(201).json({message:"Contact Created"})
+    const filter = await newa.find({email : email})
+    console.log(filter);
+
+    if(!filter){
+        res.status(403)
+        throw new Error("User already exist !!")
+    }else{
+        const data = await newa.create({
+        name : name,
+        email : email,
+        password : password
+        })
+
+    res.status(201).json(data)
+    }
+    
 })
 
 // desc get Single contacts from db
 // method GET 
 // Access public
 
-const getcontact = asynchandler((req, res)=>{
-    res.status(200).json({message:`The requested contact is ${req.params.id}`})
+const getcontact = asynchandler(async(req, res)=>{
+    const id = req.params.id
+    const data = await newa.findById(id)
+    if(!data){
+        res.status(404)
+        throw new Error("Contact not Found")
+    }
+    res.status(200).json(data)
 })
 
 // desc Update a contacts in db
 // method PUT 
 // Access public
 
-const updatecontact = asynchandler((req, res)=>{
-    res.status(200).json({message:`The Updated contact is ${req.params.id}`})
+const updatecontact = asynchandler(async(req, res)=>{
+    const {name, email, password} = req.body
+    const id = req.params.id
+    console.log(id);
+    const data = await newa.findById(id)
+    if(!data){
+        res.status(404)
+        throw new Error("Contact not Found")
+    }
+
+    const insert = await newa.findByIdAndUpdate(id,{
+        name,
+        email,
+        password
+    },{new : true})
+    res.status(200).json(insert)
 })
 
 // desc Delete a contacts in db
 // method DELETE 
 // Access public
 
-const deletecontact = asynchandler((req, res)=>{
-    res.status(200).json({message:`The Deleted contact is ${req.params.id}`})
+const deletecontact = asynchandler(async(req, res)=>{
+    const id = req.params.id
+    console.log(id);
+    const data = await newa.findById(id)
+    if(!data){
+        res.status(404)
+        throw new Error("Contact not Found")
+    }
+    const delet = await newa.deleteOne({_id : id})
+    if(delet){
+        res.status(200).json({message:`The Deleted contact is ${req.params.id}`})
+    }
+
 })
 
 
 module.exports = {allcontacts, createcontact, getcontact, updatecontact, deletecontact} 
+
+
