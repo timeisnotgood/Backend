@@ -10,12 +10,13 @@ const app = express()
 const port = process.env.PORT || 5000
 
 app.use(express.json())
-app.use(errorhandler)
 app.use('/data', require("./routes/contactroutes"))
+app.use('/user', require("./routes/userroutes"))
+app.use(errorhandler)
 
 
 if(db){
     app.listen(port, async(req, res)=>{
         console.log("Server Started");
-    })
+    })  
 }
