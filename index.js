@@ -12,7 +12,7 @@ const port = process.env.PORT || 5000
 app.use(express.json())
 app.use('/data', require("./routes/contactroutes"))
 app.use('/user', require("./routes/userroutes"))
-app.use(errorhandler)
+// app.use(errorhandler)
 
 
 if(db){
