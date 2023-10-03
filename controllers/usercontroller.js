@@ -1,6 +1,7 @@
 const expressAsyncHandler = require("express-async-handler");
 const user = require("../model/userschema")
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 
 // @ Register User
@@ -35,8 +36,30 @@ const resgisteruser = expressAsyncHandler(async(req, res)=>{
 // @ Route /user/loginuser
 // @ Private
 
-const loginuseruser = expressAsyncHandler(async(req, res)=>{
-    res.status(200).json({message : "Login uesr"})
+const loginuser = expressAsyncHandler(async(req, res)=>{
+
+    const {email, password} = req.body
+    if(!email || !password){
+        res.status(404)
+        throw new Error("All Fields are Mandatory !!")
+    }
+
+    const use = await user.findOne({email})
+    if(use && (await bcrypt.compare(password, use.password))){
+
+        const accesstoken = await jwt.sign({
+            user :{
+                "username" : use.username,
+                "email" : use.password,
+                "id" : use._id
+            },
+        },process.env.ACCESS_TOKEN_SECRET, {expiresIn : "10m"})
+        res.status(200).json(accesstoken)
+    }else{
+        res.status(400)
+        throw new Error("Email or password not valid")
+    }
+    // res.status(200).json({message : "Login uesr"})
 })
 
 // @ Current User
@@ -48,4 +71,4 @@ const currentuser = expressAsyncHandler(async(req, res)=>{
 })
 
 
-module.exports = {resgisteruser, loginuseruser, currentuser}
+module.exports = {resgisteruser, loginuser, currentuser}
