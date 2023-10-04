@@ -54,7 +54,7 @@ const loginuser = expressAsyncHandler(async(req, res)=>{
                 "id" : use._id
             },
         },process.env.ACCESS_TOKEN_SECRET, {expiresIn : "10m"})
-        res.status(200).json(accesstoken)
+        res.status(200).json({"accesstoken":accesstoken})
     }else{
         res.status(400)
         throw new Error("Email or password not valid")
